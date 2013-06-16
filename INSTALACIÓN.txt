@@ -1,0 +1,41 @@
+==SOFTWARE NECESARIO==
+1) Para poner en funcionamiento el software, es necesario tener previamente insta-
+lados en el sistema los siguientes programas:
+
+- Apache ant 1.7.1 o posterior
+- JBoss AS 7.1.1 Final
+- PostreSQL 9
+
+Para el sistema de gestión de BBDD es bastante posible que funcionen versiones
+inferiores a la indicada, e incluso otros gestores distintos como MySQL adaptan-
+do un poco la configuración.
+
+==COMPILACIÓN==
+2) Una vez descomprimido, generaremos el fichero .war con ant. Tendremos que
+sustituir la ruta de JBoss "/opt/jboss" por la de nuestro sistema:
+$ ant -Dj2ee.server.home=/opt/jboss
+
+También hay que tener en cuenta que las librerías que trae incorporadas JBoss
+deben estar en el CLASSPATH para que la compilación concluya satisfactoriamente.
+
+==DESPLEGADO==
+3) La unidad de persistencia está configurada por defecto para buscar un
+datasource con JNDI "jdbc/triican". Hemos de crear en JBoss este datasource,
+apuntando a una database vacía (la ejecución se encargará de crear las tablas).
+
+4) En el JBoss hay que desplegar el .jar necesario para el acceso a BBDD, por
+ejemplo: postgresql-9.1-902.jdbc4.jar
+
+5) Estamos listos para desplegar el .war generado por ant en el paso 2). Se ge-
+nerarán automáticamente las tablas en BBDD, así como los tipos de trabajo, los
+tipos de elemento y los perfiles de usuario predefinidos.
+
+==ENTRANDO EN EL JUEGO==
+6) No existe ningún usuario en el sistema. Tampoco hay ningún gestor de
+usuarios dentro de la aplicación. Para crear un usuario jugador:
+> INSERT INTO usuario VALUES(...);
+Si además queremos asignarle alguno de los dos perfiles predefinidos
+("gestorMapa"o "gestorTipos") deberemos añadir otra fila o filas en esta tabla:
+> INSERT INTO usuario_perfiles VALUES(...);
+
+7) Una vez creado el usuario, podremos autenticarnos normalmente.

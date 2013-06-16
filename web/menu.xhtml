@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./plantilla.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:of="http://omnifaces.org/functions">
+    
+    <ui:define name="content">
+
+        <h:inputHidden value="#{personajeControl.resetEntities()}" />
+
+        <h:form id="menuForm" >
+
+            <h:panelGrid >
+                <h:outputFormat value="#{msg.bienvenido}" >
+                    <f:param value="#{loginControl.usuario.nombre}" />
+                </h:outputFormat>
+            </h:panelGrid>
+        
+            <p:dataTable id="dataPersonajes" var="item" 
+                         value="#{of:setToList(loginControl.usuario.personajes)}">  
+                <f:facet name="header">  
+                #{msg.listaPersonajes}
+                </f:facet>  
+                        
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="#{msg.nombre}" />  
+                    </f:facet>  
+                    <h:outputText value="#{item.nombre}"/>  
+                </p:column>
+                    
+                <p:column style="text-align: center; padding-bottom: 1px; padding-top: 1px">  
+                    <f:facet name="header">  
+                        <h:outputText value="#{msg.identificadorVisual}" />  
+                    </f:facet>  
+                    <p:graphicImage id="identificador" 
+                                    url="#{item.gravatarUrl}?s=32&amp;d=wavatar&amp;f=y"/>
+                    <p:tooltip for="identificador">
+                        <p:graphicImage 
+                            url="#{item.gravatarUrl}?s=80&amp;d=wavatar&amp;f=y"/>
+                    </p:tooltip>
+                </p:column>  
+                    
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="#{msg.ubicacionActual}" />  
+                    </f:facet>  
+                    <h:outputText value="#{item.localizacion.nombre}"/>  
+                </p:column>
+                        
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="#{msg.diaNacimiento}" />  
+                    </f:facet>  
+                    <h:outputText value="#{item.diaNacimiento}"/>  
+                </p:column>
+                        
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="#{msg.acciones}" />  
+                    </f:facet>  
+                    <p:commandButton icon="ui-icon-play" ajax="false"
+                                     title="#{msg.jugar}"
+                                     action="#{personajeControl.seleccionaPersonaje(item)}" />
+                </p:column>
+            </p:dataTable>
+            
+            <h:panelGrid>
+                <p:commandButton type="button" onclick="dialog.show();"
+                value="#{msg.crearPersonaje}" />
+                                 
+                <p:dialog header="#{msg.crearPersonaje}"
+                          widgetVar="dialog" resizable="false"
+                          onShow="txtNombrePersonaje.getJQ().val('');">  
+                    <h:panelGrid columns="2" >
+                        <h:outputText value="#{msg.nombrePersonaje}:" />
+                        <p:inputText widgetVar="txtNombrePersonaje"
+                                     value="#{loginControl.nombrePersonaje}" />
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <p:commandButton value="#{msg.cancelar}" type="button"
+                                         onclick="dialog.hide();" />
+                        <p:commandButton value="#{msg.crearPersonaje}"
+                                         update="@form"
+                                         action="#{loginControl.creaPersonaje()}"
+                                         onsuccess="dialog.hide()"/>
+                    </h:panelGrid>
+                </p:dialog>
+                
+            </h:panelGrid>
+        </h:form>
+    </ui:define>
+</ui:composition>
+

@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./plantilla.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:of="http://omnifaces.org/functions">
+    
+    <ui:define name="content" rendered="#{loginControl.usuarioEsGestorTipos}">
+        
+        <h:inputHidden value="#{trabajoControl.resetEntities()}" />
+        <h:inputHidden value="#{personajeControl.resetEntities()}" />
+
+        <h:form id="trabajosForm">
+            <p:dataTable id="dataTrabajos" var="item" value="#{trabajoControl.trabajos}"
+                         rowIndexVar="rowIndex"
+                         paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  
+                         rowsPerPageTemplate="5,10,20">  
+                <f:facet name="header">  
+                    <h:outputText value="#{msg.listaTiposTrabajo}" />
+                </f:facet>  
+                
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="#{msg.nombre}" />
+                    </f:facet>  
+                    <h:outputText value="#{item.nombre}"/>  
+                </p:column>  
+                
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="#{msg.duracion}" />  
+                    </f:facet>  
+                    <h:outputText value="#{item.duracion}"/>  
+                </p:column>
+                
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="#{msg.materiales}" />  
+                    </f:facet>
+                    <ui:repeat value="#{of:setToList(item.usosMaterial)}" var="uso">
+                        <h:outputText value="#{uso.tipoMaterial.tipoElemento.nombre}&lt;br/&gt;"
+                                      escape="false" />  
+                    </ui:repeat>
+                </p:column>
+                
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="#{msg.elementoSalida}" />  
+                    </f:facet>  
+                    <h:outputText value="#{item.tipoElemento.nombre}"/>  
+                </p:column>
+                
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="#{msg.acciones}" />  
+                    </f:facet>  
+                    <p:commandButton icon="ui-icon-search" ajax="false"
+                                     title="#{msg.detalle}"
+                                     action="#{trabajoControl.editaTrabajo(item)}" />
+                    <p:commandButton icon="ui-icon-trash" title="#{msg.borrar}" type="button"
+                                     onclick="dialogConfirmacion.show();
+                                        sessionStorage.setItem('cmdBorrar', cmdBorrar_#{rowIndex}.id)" />
+                    <p:commandButton update="dataTrabajos" style="display: none"
+                                     widgetVar="cmdBorrar_#{rowIndex}"
+                                     action="#{trabajoControl.borraTrabajo(item)}" />
+
+                </p:column>
+            </p:dataTable>
+
+            <ui:include src="dialog_confirmar_borrado.xhtml" />
+            
+            <h:panelGrid>
+                <p:commandButton value="#{msg.crearTipoTrabajo}" ajax="false"
+                                 action="#{trabajoControl.creaTrabajo()}" />
+            </h:panelGrid>
+    </h:form>
+    </ui:define>
+</ui:composition>
+

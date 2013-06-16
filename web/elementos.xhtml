@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./plantilla.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+    
+    <ui:define name="content" rendered="#{loginControl.usuarioEsGestorTipos}">
+        
+        <h:inputHidden value="#{elementoControl.resetEntities()}" />
+        <h:inputHidden value="#{personajeControl.resetEntities()}" />
+
+        
+        <h:form id="elementosForm">
+            
+            <p:dataTable id="dataElementos" var="item" value="#{elementoControl.elementos}"
+                         rowIndexVar="rowIndex"
+                         paginator="true" rows="10"  
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  
+                         rowsPerPageTemplate="5,10,20">  
+                <f:facet name="header">
+                    <h:outputText value="#{msg.listaTiposElemento}" />
+                </f:facet>  
+                
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="#{msg.nombre}" />  
+                    </f:facet>  
+                    <h:outputText value="#{item.nombre}"/>  
+                </p:column>  
+                
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="#{msg.categorias}" />  
+                    </f:facet>
+                    <h:outputText value="#{msg.recurso} &lt;br/&gt;" escape="false"
+                                  rendered="#{not empty item.tipoRecurso}"/>  
+                    <h:outputText value="#{msg.herramienta} &lt;br/&gt;" escape="false"
+                                  rendered="#{not empty item.tipoHerramienta}"/>  
+                    <h:outputText value="#{msg.alimento} &lt;br/&gt;" escape="false"
+                                  rendered="#{not empty item.tipoAlimento}"/>  
+                    <h:outputText value="#{msg.material} &lt;br/&gt;" escape="false"
+                                  rendered="#{not empty item.tipoMaterial}"/>  
+                    <h:outputText value="#{msg.arma} &lt;br/&gt;" escape="false"
+                                  rendered="#{not empty item.tipoArma}"/>  
+                </p:column>
+                
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="#{msg.acciones}" />  
+                    </f:facet>  
+                    <p:commandButton icon="ui-icon-search" ajax="false"
+                                     title="#{msg.detalle}"
+                                     action="#{elementoControl.editaElemento(item)}" />
+                    <p:commandButton icon="ui-icon-trash" title="#{msg.borrar}" type="button"
+                                     onclick="dialogConfirmacion.show();
+                                        sessionStorage.setItem('cmdBorrar', cmdBorrar_#{rowIndex}.id)" />
+                    <p:commandButton update="dataElementos" style="display: none"
+                                     widgetVar="cmdBorrar_#{rowIndex}"
+                                     action="#{elementoControl.borraElemento(item)}" />
+                                     
+                </p:column>
+            </p:dataTable>
+
+            <ui:include src="dialog_confirmar_borrado.xhtml" />
+
+            <h:panelGrid>
+                <p:commandButton value="#{msg.crearTipoElemento}" ajax="false"
+                                 action="#{elementoControl.creaTipoElemento()}" />
+            </h:panelGrid>
+        </h:form>
+
+    </ui:define>
+</ui:composition>
+

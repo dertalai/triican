@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./plantilla.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:of="http://omnifaces.org/functions">
+    
+    <ui:define name="content" rendered="#{loginControl.usuarioEsGestorTipos}">
+        
+        <h:form id="trabajoForm">
+            
+            <p:panel header="#{msg.tipoTrabajo}">
+                <h:panelGrid columns="2" >
+                    <h:outputLabel value="#{msg.nombre}:" for="txtNombre"/>
+                    <h:panelGroup>
+                        <p:inputText id="txtNombre" value="#{trabajoControl.trabajo.nombre}"
+                                 required="true" requiredMessage="#{msg.requerido}"/>
+                        <p:message for="txtNombre" display="icon"/>
+                    </h:panelGroup>
+
+                    <h:outputLabel value="#{msg.duracionMedia}:" />
+                    <h:panelGroup>
+                        <p:spinner min="1" value="#{trabajoControl.trabajo.duracion}"/>
+                        <h:outputLabel value="#{msg.turnos}" />
+                    </h:panelGroup>
+                </h:panelGrid>
+            
+                <p:panel header="#{msg.habilidadesNecesarias}" >
+                    <h:panelGrid columns="2" width="100%">
+                        <h:outputText value="#{msg.fuerza}:" />  
+                        <h:panelGroup>
+                            <h:outputText id="txtFuerza"
+                                          value="#{trabajoControl.conjuntoHabilidades.fuerza}%"/>  
+                            <h:inputHidden id="fuerza" 
+                                           value="#{trabajoControl.conjuntoHabilidades.fuerza}" />  
+                            <p:slider for="fuerza" display="txtFuerza" style="width:200px"
+                                      displayTemplate="{value}%" />  
+                        </h:panelGroup>
+                        <h:outputText value="#{msg.agilidad}:" />  
+                        <h:panelGroup>
+                            <h:outputText id="txtAgilidad"
+                                          value="#{trabajoControl.conjuntoHabilidades.agilidad}%"/>  
+                            <h:inputHidden id="agilidad" 
+                                           value="#{trabajoControl.conjuntoHabilidades.agilidad}" />  
+                            <p:slider for="agilidad" display="txtAgilidad" style="width:200px"
+                                      displayTemplate="{value}%" />  
+                        </h:panelGroup>
+                        <h:outputText value="#{msg.destreza}:" />  
+                        <h:panelGroup>
+                            <h:outputText id="txtDestreza"
+                                          value="#{trabajoControl.conjuntoHabilidades.destreza}%"/>  
+                            <h:inputHidden id="destreza" 
+                                           value="#{trabajoControl.conjuntoHabilidades.destreza}" />  
+                            <p:slider for="destreza" display="txtDestreza" style="width:200px"
+                                      displayTemplate="{value}%" />  
+                        </h:panelGroup>
+                        <h:outputText value="#{msg.percepcion}:" />  
+                        <h:panelGroup>
+                            <h:outputText id="txtPercepcion"
+                                          value="#{trabajoControl.conjuntoHabilidades.percepcion}%"/>  
+                            <h:inputHidden id="percepcion" 
+                                           value="#{trabajoControl.conjuntoHabilidades.percepcion}" />  
+                            <p:slider for="percepcion" display="txtPercepcion" style="width:200px"
+                                      displayTemplate="{value}%" />  
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </p:panel>    
+            
+                
+                <p:panel id="panelMateriales" header="#{msg.materiales}" >
+                    <p:dataTable id="dataMateriales" var="uso"
+                                 value="#{trabajoControl.usosMaterial}">  
+                        <p:column>  
+                            <f:facet name="header">  
+                                <h:outputText value="#{msg.material}" />  
+                            </f:facet>  
+                            <h:outputText value="#{uso.tipoMaterial.tipoElemento.nombre}"/>  
+                        </p:column>  
+                        <p:column>  
+                            <f:facet name="header">  
+                                <h:outputText value="#{msg.cantidadUsada}" />  
+                            </f:facet>  
+                            <p:spinner min="1" value="#{uso.cantidad}"/>
+                        </p:column>  
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.acciones}" />  
+                            </f:facet>
+                            <p:commandButton id="borrarMaterial" icon="ui-icon-trash"
+                                             title="#{msg.participar}"
+                                             update=":trabajoForm:panelMateriales"
+                                             action="#{trabajoControl.borraMaterial(uso)}" />
+                            
+                        </p:column>
+                    
+                    </p:dataTable>
+                
+                    <h:panelGrid columns="3" >
+                        <h:outputText value="#{msg.tipoMaterial}:" />
+                        <p:selectOneMenu value="#{trabajoControl.seleccionMaterial}" converter="tipoMaterialConverter"
+                                         disabled="#{empty trabajoControl.materiales}">  
+                            <f:selectItems value="#{trabajoControl.materiales}" var="material"
+                                           itemLabel="#{material.tipoElemento.nombre}"
+                                           itemValue="#{material}" />  
+                        </p:selectOneMenu>
+                        <p:commandButton value="#{msg.anadir}" action="#{trabajoControl.anadirMaterial()}"
+                                         disabled="#{empty trabajoControl.materiales}"
+                                         process="panelMateriales" update="panelMateriales"/>
+                    </h:panelGrid>
+                </p:panel>
+            
+                <p:panel header="#{msg.herramientasNecesarias}" >
+                    <p:pickList id="pickHerramientas" var="herramienta"
+                                value="#{trabajoControl.herramientasPick}" converter="tipoHerramientaConverter"    
+                                itemLabel="#{herramienta.tipoElemento.nombre}" itemValue="#{herramienta}" >
+                        <f:facet name="sourceCaption">#{msg.disponibles}</f:facet>  
+                        <f:facet name="targetCaption">#{msg.seleccionados}</f:facet>  
+                    </p:pickList>
+                </p:panel>
+            
+                <p:panel header="#{msg.elementoSalida}" >
+                    <h:panelGrid columns="2" >
+                        <h:outputText value="#{msg.tipoElemento}:" />
+                        <p:selectOneMenu value="#{trabajoControl.elemento}"
+                                         converter="tipoElementoConverter">  
+                            <f:selectItems value="#{trabajoControl.elementos}" var="elemento"
+                                           itemLabel="#{elemento.nombre}" itemValue="#{elemento}" />  
+                        </p:selectOneMenu>
+                
+                        <h:outputText value="#{msg.cantidadObtenida}:" />
+                        <h:panelGroup>
+                            <p:spinner value="#{trabajoControl.trabajo.cantidadSalida}"
+                                       min="1"/>
+                            <h:outputLabel value="#{msg.unidades}"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </p:panel>
+            
+                <h:panelGrid columns="2" >            
+                    <p:commandButton value="#{msg.cancelar}" ajax="false"
+                                     immediate="true"
+                                     action="#{trabajoControl.cancela()}"/>
+                    <p:commandButton value="#{msg.guardar}" ajax="false"
+                                     action="#{trabajoControl.guardaTrabajo()}"/>
+                </h:panelGrid>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>
+

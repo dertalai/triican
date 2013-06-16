@@ -1,0 +1,138 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./plantilla.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:of="http://omnifaces.org/functions">
+    
+    <ui:define name="content" rendered="#{loginControl.usuarioEsGestorTipos}">
+            
+        <h:form id="elementoForm">
+            <p:panel header="#{msg.tipoElemento}">
+                <h:panelGrid columns="2" >
+                    <h:outputLabel value="#{msg.nombre}:" for="txtNombre"/>
+                    <h:panelGroup>
+                        <p:inputText id="txtNombre" value="#{elementoControl.elemento.nombre}"
+                                 required="true" requiredMessage="#{msg.requerido}"/>
+                        <p:message for="txtNombre" display="icon"/>
+                    </h:panelGroup>
+                    
+                    <h:outputLabel value="#{msg.categorias}:" />
+                    <p:selectManyButton value="#{elementoControl.seleccionCategorias}"
+                                        onchange="mostrarPanel(this.value, this.checked)" >
+                        <f:selectItems value="#{elementoControl.categorias}" var="item"
+                                       itemLabel="#{msg[item]}" itemValue="#{item}" />
+                                   
+                    </p:selectManyButton>
+                </h:panelGrid>
+            
+                <p:panel id="panel_RECURSO" header="#{msg.atributosRecursoNatural}">
+            
+                    <p:dataTable id="dataRecurso" value="#{of:setToList(elementoControl.extracciones)}"
+                                 var="extraccion" >  
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.formasExtraccion}" />
+                        </f:facet>  
+                        
+                        <p:column>  
+                            <f:facet name="header">  
+                                <h:outputText value="#{msg.herramienta}" />  
+                            </f:facet>
+                            <h:outputText value="#{extraccion.tipoHerramienta == null ?
+                                           msg.ninguno : extraccion.tipoHerramienta.tipoElemento.nombre}"/>
+                        </p:column>  
+                        
+                        <p:column>  
+                            <f:facet name="header">  
+                                <h:outputText value="#{msg.tasaExtraccion}" />  
+                            </f:facet>  
+                            <p:spinner min="0" value="#{extraccion.tasa}"/>
+                        </p:column>
+                        
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.acciones}" />  
+                            </f:facet>
+                            <p:commandButton id="borrarRecurso" icon="ui-icon-trash"
+                                             title="#{msg.borrar}"
+                                             update=":elementoForm:panel_RECURSO"
+                                             action="#{elementoControl.borraRecurso(extraccion)}" />
+                            
+                        </p:column>
+                    </p:dataTable>
+                
+                    <h:panelGrid columns="3" >
+                        <h:outputLabel value="#{msg.herramienta}:" />
+                        <p:selectOneMenu value="#{elementoControl.seleccionHerramienta}"
+                                         disabled="#{empty elementoControl.herramientas}"
+                                         converter="tipoHerramientaConverter">
+                            <f:selectItems value="#{elementoControl.herramientas}" var="item"
+                                           itemValue="#{item}"
+                                           itemLabel="#{item == null ? msg.ninguno : item.tipoElemento.nombre}"/>
+                        </p:selectOneMenu>              
+                        <p:commandButton disabled="#{empty elementoControl.herramientas}"
+                                         value="#{msg.anadir}" action="#{elementoControl.anadirRecurso()}"
+                                         process="panel_RECURSO" update="panel_RECURSO"/>
+                        
+                        <h:panelGroup />
+                    </h:panelGrid>
+                </p:panel>
+            
+                <p:panel id="panel_ALIMENTO" header="#{msg.atributosAlimento}">
+                    <h:panelGrid columns="2" >
+                        <h:outputLabel value="#{msg.saciedad}:" />
+                        <p:spinner id="spinnerSaciedad" min="0" widgetVar="saciedad"
+                                   value="#{elementoControl.alimento.saciedad}"/>
+                        
+                        <h:outputLabel value="#{msg.curacionEnvenenamiento}:" />
+                        <p:spinner id="spinnerCuracion" 
+                                   value="#{elementoControl.alimento.curacion}"/>
+                    </h:panelGrid>
+                </p:panel>
+            
+                <p:panel id="panel_ARMA" header="#{msg.atributosArma}" >
+                    <h:panelGrid columns="2" >
+                        <h:outputLabel value="#{msg.ataque}:" />
+                        <p:spinner id="spinnerAtaque" min="0"
+                                   value="#{elementoControl.arma.ataque}" />
+                        
+                        <h:outputLabel value="#{msg.defensa}:" />
+                        <p:spinner id="spinnerDefensa" min="0"
+                                   value="#{elementoControl.arma.defensa}"/>
+                    </h:panelGrid>
+                </p:panel>
+            
+                <h:panelGrid columns="2" >            
+                    <p:commandButton value="#{msg.cancelar}" ajax="false"
+                                     immediate="true"
+                                     action="#{elementoControl.cancela()}"/>
+                    <p:commandButton value="#{msg.guardar}" ajax="false"
+                                     action="#{elementoControl.guardaElemento()}"/>
+                </h:panelGrid>
+            </p:panel>
+        </h:form>
+        
+        <script type="text/javascript">
+            $(".ui-spinner-input").map(function(){
+                if( !$(this).val() ) {
+                    $(this).val(0);
+                }            
+            });
+            
+            $("#elementoForm :input:checkbox").map(function(){
+                mostrarPanel(this.value, this.checked);
+            });
+
+            function mostrarPanel(nombre, valor) {
+                var panel = $('#elementoForm\\:panel_' + nombre);
+                if(panel !== null) {
+                    valor ? panel.show() : panel.hide();
+                }
+            }
+        </script>
+
+    </ui:define>
+</ui:composition>
+

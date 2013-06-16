@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
+          
+    <h:form id="formInventario">
+        <p:dataTable id="dataInventario" var="item" value="#{personajeControl.inventario}"  
+                     rowIndexVar="rowIndex"
+                     paginator="true" rows="10"
+                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  
+                     rowsPerPageTemplate="5,10,20">  
+            <f:facet name="header">  
+                #{msg.inventario}
+            </f:facet>  
+                
+            <p:column>  
+                <f:facet name="header">  
+                    <h:outputText value="#{msg.nombre}" />  
+                </f:facet>  
+                <h:outputText rendered="#{item.class.simpleName != 'Nota'}"
+                              value="#{item.tipoElemento.nombre}"/>  
+                <h:outputText rendered="#{item.class.simpleName == 'Nota'}"
+                              value='#{item.tipoElemento.nombre} "#{item.titulo}"'/>  
+            </p:column>  
+                
+            <p:column>  
+                <f:facet name="header">  
+                    <h:outputText value="#{msg.cantidad}" />  
+                </f:facet>  
+                <h:outputText value="#{item.cantidad}" />
+            </p:column>  
+                
+            <p:column>  
+                <f:facet name="header">  
+                    <h:outputText value="#{msg.acciones}" />  
+                </f:facet>
+                <p:commandButton icon="ui-icon-arrowthick-1-s" type="button"
+                                 title="#{msg.soltar}"
+                                 onclick="spinnerCantidadSoltar.cfg.max=#{item.cantidad};
+                                    sessionStorage.setItem('cmdSoltar', cmdSoltar_#{rowIndex}.id);
+                                    dialogSoltarElemento.show();" />
+                <p:commandButton icon="ui-icon-arrowthick-1-e" type="button"
+                                 title="#{msg.dar}"
+                                 onclick="spinnerCantidadDar.cfg.max=#{item.cantidad};
+                                    sessionStorage.setItem('cmdDar', cmdDar_#{rowIndex}.id);
+                                    dialogDarElemento.show();" />
+                <p:commandButton type="button"
+                                 rendered="#{item.class.simpleName == 'Nota'}"
+                                 value="#{msg.leerNota}"
+                                 onclick="txtTituloNota.getJQ().val(
+                                             ocultoTitulo_#{rowIndex}.getJQ().val() );
+                                     txtTextoNota.getJQ().val(
+                                             ocultoTexto_#{rowIndex}.getJQ().val() );
+                                     dialogNota.show();"/>
+            </p:column>
+                
+            <p:column id='columnOculto' rendered="#{item.class.simpleName == 'Nota'}"
+                      style="display: none;">
+                <p:inputText widgetVar="ocultoTitulo_#{rowIndex}"
+                             value='#{item.titulo}' />
+                <p:inputTextarea widgetVar="ocultoTexto_#{rowIndex}"
+                                 value='#{item.texto}' />
+            </p:column>
+                
+            <p:column id="columnItemOculto" style='display: none;'>
+                <p:commandButton widgetVar="cmdSoltar_#{rowIndex}"
+                         update="dataInventario"
+                         action="#{personajeControl.sueltaElemento(item)}" />
+                <p:commandButton widgetVar="cmdDar_#{rowIndex}"
+                         update="dataInventario"
+                         action="#{personajeControl.daElemento(item)}" />
+            </p:column>
+    </p:dataTable>
+        
+        <p:dialog widgetVar="dialogSoltarElemento" resizable="false"
+                  header="#{msg.soltar} "
+                  onShow="this.getJQ().find('table')[0].style.display = spinnerCantidadSoltar.cfg.max == 1 ? 'none' : 'table';
+                    spinnerCantidadSoltar.value = 1;">
+            <h:panelGrid>
+                <h:outputLabel for="spinnerCantidadSoltar" value="#{msg.cantidad}:" />
+                <p:spinner id="spinnerCantidadSoltar" widgetVar="spinnerCantidadSoltar"
+                           min="1"
+                           value="#{personajeControl.cantidad}"/>
+            </h:panelGrid>
+            <h:panelGrid columns="2" width="100%">
+                <p:commandButton value="#{msg.cancelar}" type="button"
+                                 onclick="dialogSoltarElemento.hide();" />
+                <p:commandButton value="#{msg.soltar}" type="button" style="float: right"
+                                 onclick="dialogSoltarElemento.hide();
+                                 document.getElementById(sessionStorage.cmdSoltar).click();" />
+            </h:panelGrid>
+        </p:dialog>
+        
+        
+        <p:dialog widgetVar="dialogDarElemento"
+                  header="#{msg.dar} "
+                  resizable="false"
+                  onShow="this.getJQ().find('table')[0].style.display = spinnerCantidadDar.cfg.max == 1 ? 'none' : 'table';
+                  spinnerCantidadDar.value = 1; ">  
+            <h:panelGrid columns="2">
+                <h:outputLabel for="spinnerCantidadDar" value="#{msg.cantidad}:" />
+                <p:spinner id="spinnerCantidadDar" widgetVar="spinnerCantidadDar"
+                           min="1"
+                           value="#{personajeControl.cantidad}"/>
+            </h:panelGrid>
+            <h:panelGrid columns="2" >
+                <h:outputLabel value="#{msg.persona}:" />
+                <p:selectOneMenu value='#{personajeControl.receptor}'
+                                 converter="personajeConverter">
+                    <f:selectItems value="#{of:setToList(personajeControl.personajes)}" var="pers"
+                                   itemLabel="#{pers.nombre}"
+                                   itemValue="#{pers}"/>
+                </p:selectOneMenu>
+            </h:panelGrid>
+            <h:panelGrid columns="2" width="100%">
+                <p:commandButton value="#{msg.cancelar}" type="button"
+                                 onclick="dialogDarElemento.hide();" />
+                <p:commandButton value="#{msg.soltar}" type="button" style="float: right;"
+                                 onclick="dialogDarElemento.hide();
+                                 document.getElementById(sessionStorage.cmdDar).click();" />
+            </h:panelGrid>
+        </p:dialog>
+        
+        
+    <ui:include src='dialog_nota.xhtml'>
+        <ui:param name="editable" value="#{false}" />
+        <ui:param name="headerDialog" value="#{msg.contenidoNota}" />
+    </ui:include>
+        
+        
+</h:form>
+</html>

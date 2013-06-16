@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions">
+          
+    <p:dialog widgetVar="dialogNota" header="#{headerDialog}"
+              dynamic="#{editable}"
+              resizable="true"
+              onShow="if(#{editable}) {
+              txtTextoNota.getJQ().val('');
+              txtTituloNota.getJQ().val(''); }">
+        <h:panelGrid columns="2" width="100%">
+            <h:outputText value="#{msg.titulo}:" />
+            <p:inputText value="#{personajeControl.tituloNota}"
+                         readonly="#{not editable}"
+                         widgetVar="txtTituloNota"
+                         style="min-width: 80%;"
+                         maxlength="128" />
+            <h:outputText value="#{msg.texto}:" />
+            <h:panelGroup />
+        </h:panelGrid>
+                                
+        <h:panelGrid width="100%">
+            <p:inputTextarea widgetVar="txtTextoNota" maxlength="32768"
+                         readonly="#{not editable}"
+                         value="#{personajeControl.textoNota}"
+                         style="min-height: 200px; min-width: 400px"/>
+        </h:panelGrid>
+                                
+        <h:panelGrid columns="2" rendered="#{editable}">
+            <p:commandButton value="#{msg.cancelar}" type="button"
+                             onclick="dialogNota.hide();" />
+            <p:commandButton value="#{msg.crearNota}"
+                             update=":tabView:formActividad" process=":tabView:formActividad"
+                             onsuccess="dialogNota.hide();"
+                             action="#{personajeControl.creaNota()}" />
+        </h:panelGrid>
+    </p:dialog>
+                            
+                            
+                            
+                            
+</html>

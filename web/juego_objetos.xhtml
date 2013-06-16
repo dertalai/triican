@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions">
+
+    
+    
+                    <h:form id="formObjetos">
+                        <p:dataTable id="dataObjetos" var="item"
+                                     value="#{of:setToList(personajeControl.elementosSuelo)}"  
+                                     rowIndexVar="rowIndex"
+                                     paginator="true" rows="10"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  
+                                     rowsPerPageTemplate="5,10,20">  
+                            <f:facet name="header">  
+                            #{msg.objetosPresentes}
+                            </f:facet>  
+                                
+                            <p:column>  
+                                <f:facet name="header">  
+                                    <h:outputText value="#{msg.nombre}" />  
+                                </f:facet>  
+                                <h:outputText rendered="#{item.class.simpleName != 'Nota'}"
+                                              value="#{item.tipoElemento.nombre}"/>  
+                                <h:outputText rendered="#{item.class.simpleName == 'Nota'}"
+                                              value='#{item.tipoElemento.nombre} "#{item.titulo}"'/>  
+                            </p:column>  
+                                
+                            <p:column>  
+                                <f:facet name="header">  
+                                    <h:outputText value="#{msg.cantidad}" />  
+                                </f:facet>  
+                                <h:outputText value="#{item.cantidad}"/>  
+                            </p:column>  
+                                
+                            <p:column>  
+                                <f:facet name="header">  
+                                    <h:outputText value="#{msg.acciones}" />  
+                                </f:facet>
+                                <p:commandButton icon="ui-icon-arrowthick-1-n" type="button"
+                                                 title="#{msg.coger}"
+                                                 onclick="spinnerCantidadCoger.cfg.max=#{item.cantidad};
+                                                     sessionStorage.setItem('cmdCoger', cmdCoger_#{rowIndex}.id);
+                                                     dialogCogerElemento.show();" />
+                                <p:commandButton type="button"
+                                                 rendered="#{item.class.simpleName == 'Nota'}"
+                                                 value="#{msg.leerNota}"
+                                                 onclick="txtTituloNota.getJQ().val(
+                                                             ocultoTitulo_#{rowIndex}.getJQ().val()
+                                                 );
+                                                     txtTextoNota.getJQ().val(
+                                                             ocultoTexto_#{rowIndex}.getJQ().val()
+                                                 );
+                                                     dialogNota.show();"/>
+                            </p:column>  
+                                
+                            <p:column id='columnOculto' rendered="#{item.class.simpleName == 'Nota'}"
+                                      style="display: none;">
+                                <p:inputText widgetVar="ocultoTitulo_#{rowIndex}"
+                                             value='#{item.titulo}' />
+                                <p:inputTextarea widgetVar="ocultoTexto_#{rowIndex}"
+                                                 value='#{item.texto}' />
+                            </p:column>
+                                
+                            <p:column id="columnItemOculto" style='display: none;'>
+                                <p:commandButton widgetVar="cmdCoger_#{rowIndex}"
+                                                 update="dataObjetos"
+                                                 action="#{personajeControl.cogeElemento(item)}" />
+                            </p:column>
+                        </p:dataTable>
+                            
+                        <p:dialog widgetVar="dialogCogerElemento" resizable="false"
+                                  header="#{msg.coger} "
+                                  onShow="this.getJQ().find('table')[0].style.display = spinnerCantidadCoger.cfg.max == 1 ? 'none' : 'table';
+                                  spinnerCantidadCoger.value = 1;">
+                            <h:panelGrid>
+                                <h:outputLabel for="spinnerCantidadCoger" value="#{msg.cantidad}:" />
+                                <p:spinner id="spinnerCantidadCoger" widgetVar="spinnerCantidadCoger"
+                                           min="1"
+                                           value="#{personajeControl.cantidad}"/>
+                            </h:panelGrid>
+                            <h:panelGrid columns="2" width="100%">
+                                <p:commandButton value="#{msg.cancelar}" type="button"
+                                                 onclick="dialogCogerElemento.hide();" />
+                                <p:commandButton value="#{msg.coger}" type="button" style="float: right"
+                                                 onclick="dialogCogerElemento.hide();
+                                                     document.getElementById(sessionStorage.cmdCoger).click();" />
+                            </h:panelGrid>
+                        </p:dialog>
+                            
+                            
+                        <ui:include src='dialog_nota.xhtml'>
+                            <ui:param name="editable" value="#{false}" />
+                            <ui:param name="headerDialog" value="#{msg.contenidoNota}" />
+                        </ui:include>
+                            
+                    </h:form>
+    
+    
+    
+    
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions" xmlns:c="http://java.sun.com/jsp/jstl/core">
+          
+          
+          
+          
+    <h:form id="formTrabajos">
+        
+        <p:dataTable id="dataTrabajos" var="trabajo" 
+                     value="#{personajeControl.trabajos}"  
+                     rowsPerPageTemplate="5,10,20">  
+            <f:facet name="header">  
+                #{msg.trabajosIniciados}
+            </f:facet>  
+                
+            <p:column>  
+                <f:facet name="header">  
+                    <h:outputText value="#{msg.nombre}" />  
+                </f:facet>  
+                <h:outputText value="#{trabajo.tipoTrabajo.nombre}"/>
+                <h:outputText rendered="#{trabajo.tipoRecurso != null}"
+                              value="(#{trabajo.tipoRecurso.tipoElemento.nombre})" />
+            </p:column>  
+                
+            <p:column>  
+                <f:facet name="header">  
+                    <h:outputText value="#{msg.duracionTotal}" />  
+                </f:facet>  
+                <h:outputText value="#{trabajo.tipoTrabajo.duracion}"/>  
+            </p:column>
+                
+            <p:column>  
+                <f:facet name="header">  
+                    <h:outputText value="#{msg.avance}" />  
+                </f:facet>  
+                <h:outputText value="#{100 * trabajo.completado / trabajo.tipoTrabajo.duracion}%"/>  
+            </p:column>
+                
+            <p:column>  
+                <f:facet name="header">  
+                    <h:outputText value="#{msg.iniciadoPor}" />  
+                </f:facet>  
+                <h:outputText value="#{trabajo.personajeCreador.nombre}"/>  
+            </p:column>
+                
+            <p:column>  
+                <f:facet name="header">  
+                    <c:set var="participantes" 
+                           value="#{of:setToList(personajeControl.getParticipantes(trabajo))}"/>
+                    <h:outputText value="#{msg.participantes}" />  
+                </f:facet>  
+                <ui:repeat value="#{participantes}"
+                           var="participante" >
+                    <h:outputText value="#{participante.nombre}" />
+                    <h:outputText value="&lt;br/&gt;" escape="false" />
+                </ui:repeat>
+            </p:column>
+                
+            <p:column>  
+                <f:facet name="header">  
+                    <h:outputText value="#{msg.acciones}" />  
+                </f:facet>
+                <p:commandButton rendered="#{personajeControl.personaje.trabajoParticipa == trabajo}"
+                                 icon="ui-icon-stop"
+                                 title="#{msg.dejarParticipar}"
+                                 update=":tabView:formTrabajos :tabView:formActividad:txtSucesos"
+                                 action="#{personajeControl.participa(null)}"
+                                 />
+                <p:commandButton style="visibility: #{personajeControl.personaje.trabajoParticipa == null ? 'visible' : 'hidden'};"
+                                 icon="ui-icon-play"
+                                 title="#{msg.participar}"
+                                 update=":tabView:formTrabajos :tabView:formActividad:txtSucesos"
+                                 action="#{personajeControl.participa(trabajo)}"                                
+                                 />
+                                     
+            </p:column>
+        </p:dataTable>
+    </h:form>
+        
+        
+        
+        
+        
+        
+</html>

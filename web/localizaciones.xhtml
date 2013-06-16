@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./plantilla.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:of="http://omnifaces.org/functions">
+    
+    <ui:define name="content" rendered="#{loginControl.usuarioEsGestorMapa}">
+        
+        <h:inputHidden value="#{localizacionControl.resetEntities()}" />
+        <h:inputHidden value="#{personajeControl.resetEntities()}" />
+
+        
+        <h:form id="localizacionesForm">
+            <p:dataTable id="localizaciones" var="item" value="#{localizacionControl.localizaciones}"
+                         rowIndexVar="rowIndex"
+                         paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  
+                         rowsPerPageTemplate="5,10,20">  
+                <f:facet name="header">
+                    <h:outputText value="#{msg.listaLocalizaciones}" />
+                </f:facet>  
+                
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="Nombre" />  
+                    </f:facet>  
+                    <h:outputText value="#{item.nombre}"/>  
+                </p:column>  
+                
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="Coordenadas" />  
+                    </f:facet>  
+                    <h:outputText value="#{item.x}, #{item.y}"/>  
+                </p:column>
+                
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="Recursos" />
+                    </f:facet>  
+                    <ui:repeat value="#{of:setToList(item.recursos)}" var="recurso">
+                        <h:outputText value="#{recurso.tipoElemento.nombre}" /><h:outputText value="&lt;br/&gt;" escape="false" />
+                    </ui:repeat>
+                </p:column>
+                
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="Conexiones" />
+                    </f:facet>
+                    <ui:repeat value="#{of:setToList(item.localizaciones)}" var="conexion">
+                        <h:outputText value="#{conexion.nombre} (#{msg[item.getDireccionHacia(conexion)]})" /><h:outputText value="&lt;br/&gt;" escape="false" />
+                    </ui:repeat>
+                </p:column>
+                
+                <p:column>  
+                    <f:facet name="header">  
+                        <h:outputText value="Acciones" />  
+                    </f:facet>  
+                    <p:commandButton icon="ui-icon-search" ajax="false"
+                                     title="#{msg.detalle}"
+                                     action="#{localizacionControl.editaLocalizacion(item)}" />
+                    <p:commandButton icon="ui-icon-trash" title="#{msg.borrar}" type="button"
+                                     onclick="dialogConfirmacion.show();
+                                        sessionStorage.setItem('cmdBorrar', cmdBorrar_#{rowIndex}.id)" />
+                    <p:commandButton update="localizaciones" style="display: none"
+                                     widgetVar="cmdBorrar_#{rowIndex}"
+                                     action="#{localizacionControl.borraLocalizacion(item)}" />
+                </p:column>
+            </p:dataTable>
+
+            <ui:include src="dialog_confirmar_borrado.xhtml" />
+            
+            <h:panelGrid>
+                <p:commandButton value="#{msg.crearLocalizacion}" ajax="false"
+                                 action="#{localizacionControl.creaLocalizacion()}" />
+            </h:panelGrid>
+        </h:form>
+    </ui:define>
+</ui:composition>
+

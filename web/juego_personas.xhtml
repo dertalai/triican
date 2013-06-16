@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    
+    
+    
+    <h:form id="formPersonas">
+        <p:dataTable id="dataPersonas" var="persona"
+                     rowIndexVar="rowIndex"
+                     value="#{of:setToList(personajeControl.personajes)}"  
+                     paginator="true" rows="10"
+                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  
+                     rowsPerPageTemplate="5,10,20">  
+            <f:facet name="header">  
+                #{msg.personasPresentes}
+            </f:facet>  
+            
+            <p:column>  
+                <f:facet name="header">  
+                    <h:outputText value="#{msg.nombre}" />  
+                </f:facet>  
+                <h:outputText value="#{persona.nombre}"/>  
+            </p:column>  
+            
+            <p:column style="text-align: center; padding-bottom: 1px; padding-top: 1px">  
+                <f:facet name="header">  
+                    <h:outputText value="#{msg.identificadorVisual}" />  
+                </f:facet>  
+                <p:graphicImage id="identificador" 
+                                url="#{persona.gravatarUrl}?s=32&amp;d=wavatar&amp;f=y"/>
+                <p:tooltip for="identificador">
+                    <p:graphicImage 
+                                url="#{persona.gravatarUrl}?s=80&amp;d=wavatar&amp;f=y"/>
+                </p:tooltip>
+            </p:column>  
+            
+            <p:column>  
+                <f:facet name="header">  
+                    <h:outputText value="#{msg.acciones}" />  
+                </f:facet>
+                
+                <p:commandButton value="#{msg.susurrar}" type="button"
+                                 onclick="sessionStorage.setItem('cmdSusurrar', cmdSusurrar_#{rowIndex}.id);
+                                     dialogSusurrar.show();" />
+                <p:commandButton value="#{msg.atacar}" type="button"
+                                 onclick="sessionStorage.setItem('cmdAtacar', cmdAtacar_#{rowIndex}.id);
+                                     dialogAtacar.show();" />
+            </p:column>
+            
+            
+            <p:column id="columnItemOculto" style='display: none;'>
+                <p:commandButton widgetVar="cmdSusurrar_#{rowIndex}"
+                                 update="dataPersonas"
+                                 action="#{personajeControl.habla(persona)}" />
+                <p:commandButton widgetVar="cmdAtacar_#{rowIndex}"
+                                 update="dataPersonas"
+                                 action="#{personajeControl.ataca(persona)}" />
+            </p:column>
+
+        </p:dataTable>
+            
+            
+        <p:dialog id="dialogSusurrar" widgetVar="dialogSusurrar"
+                  onShow="inputSusurrar.getJQ().val('');"
+                  header="#{msg.susurrar}">
+            <h:panelGrid columns="2" >
+                <h:outputLabel value="#{msg.mensaje}" />
+                <p:inputText value="#{personajeControl.textoHablar}" size='40'
+                             onkeypress="if(event.keyCode == 13) {return false;};"
+                             widgetVar="inputSusurrar"/>
+            </h:panelGrid>
+                                 
+            <h:panelGrid columns="2" width="100%">
+                <p:commandButton value="#{msg.cancelar}" type="button"
+                                 onclick="dialogSusurrar.hide();" />
+                <p:commandButton value="#{msg.susurrar}" type="button" style="float: right;"
+                                 onclick="dialogSusurrar.hide();
+                                     document.getElementById(sessionStorage.cmdSusurrar).click();" />
+            </h:panelGrid>
+        </p:dialog>
+        
+        
+        <p:dialog id="dialogAtacar" widgetVar="dialogAtacar"
+                  header="#{msg.atacar}">
+            <h:panelGrid columns="2" >
+                <h:outputLabel value="#{msg.arma}:" />
+                <p:selectOneMenu widgetVar="selectArma"
+                                 value="#{personajeControl.armaSeleccionada}"
+                                 converter="elementoConverter">
+                    <f:selectItems value="#{personajeControl.armas}" var="arma"
+                                   itemLabel="#{arma != null ? arma.tipoElemento.nombre : msg.punnos}
+                                   #{arma != null ? arma.tipoElemento.tipoArma.ataque : ''}"
+                                   itemValue="#{arma}" />
+                </p:selectOneMenu>
+            </h:panelGrid>
+            
+            <h:panelGrid columns="2" width="100%">
+                <p:commandButton value="#{msg.cancelar}" type="button"
+                                 onclick="dialogAtacar.hide();" />
+                <p:commandButton value="#{msg.atacar}" type="button" style="float: right;"
+                                 onclick="dialogAtacar.hide();
+                                     document.getElementById(sessionStorage.cmdAtacar).click();" />
+            </h:panelGrid>
+        </p:dialog>
+        
+    </h:form>
+    
+    
+    
+    
+</html>

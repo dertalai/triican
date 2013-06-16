@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions">
+    
+    <h:head>
+        <f:facet name="first">
+            <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
+            <title>Triican</title>
+        </f:facet>
+    </h:head>
+    
+    <h:body>
+        <p:layout fullPage="true">
+            <p:layoutUnit position="north" >
+            
+                <h:form rendered="#{loginControl.estaAutenticado()}"
+                        id="loginForm">
+
+                        <p:spacer width="20px" />
+                        
+                        <p:button href="/" value="#{msg.salir}" />
+                            
+                        <p:spacer width="20px" />
+                            
+                        <h:outputFormat value="#{msg.autenticadoComo}." >
+                            <f:param value="#{loginControl.usuario.nombre}" />
+                        </h:outputFormat>
+                            
+                        <p:spacer width="20px" />
+                            
+                        <h:outputText id="infoTiempo"
+                                      value="#{msg.dia} #{loginControl.dia}, #{msg.turno} #{loginControl.turno}." />                    
+                        <p:poll interval="60"
+                                update=":loginForm:infoTiempo" process="@none"
+                                global="false"
+                                async="true"/>
+                                    
+                        <p:spacer width="20px" />
+                            
+                        <h:panelGroup layout="block" style="float: right;"
+                                     id="identificador" 
+                                     rendered="#{personajeControl.personaje != null}">
+                            <h:outputFormat value="#{msg.jugandoComo}. " >
+                                <f:param value="#{personajeControl.personaje.nombre}" />
+                            </h:outputFormat>
+
+                            <p:graphicImage url="#{personajeControl.personaje.gravatarUrl}?s=20&amp;d=wavatar&amp;f=y" />
+
+                            <p:spacer width="20px" />
+                        </h:panelGroup>
+                        <p:tooltip for="identificador"
+                                   rendered="#{personajeControl.personaje != null}">
+                            <p:graphicImage 
+                                url="#{personajeControl.personaje.gravatarUrl}?s=80&amp;d=wavatar&amp;f=y"/>
+                        </p:tooltip>                            
+                            
+                </h:form>
+                
+            </p:layoutUnit>
+            
+            <p:layoutUnit position="west" header="#{msg.menu}" collapsible="true">
+                
+                <p:menu >
+                    <p:submenu label="#{msg.juego}">
+                        <p:menuitem value="#{msg.inicio}" outcome="menu" />
+                    </p:submenu>
+                    <p:submenu rendered="#{loginControl.usuarioEsGestorMapa or
+                                           loginControl.usuarioEsGestorTipos}"
+                        label="#{msg.administracion}">
+                        <p:menuitem rendered="#{loginControl.usuarioEsGestorMapa}"
+                            value="#{msg.gestionarMapa}" outcome="localizaciones" />
+                        <p:menuitem rendered="#{loginControl.usuarioEsGestorTipos}"
+                            value="#{msg.gestionarTiposElemento}" outcome="elementos" />
+                        <p:menuitem rendered="#{loginControl.usuarioEsGestorTipos}"
+                            value="#{msg.gestionarTiposTrabajo}" outcome="trabajos" />
+                    </p:submenu>
+                        
+                </p:menu>
+            </p:layoutUnit>
+            
+            <p:layoutUnit id="contenido" 
+                          position="center" rendered="#{loginControl.estaAutenticado()}">
+                <p:ajaxStatus onstart="dialogCargando.show();" onsuccess="dialogCargando.hide();"/>  
+              
+                <p:dialog modal="true" widgetVar="dialogCargando" header="#{msg.procesando}"   
+                          draggable="false" closable="false" appendToBody="true"
+                          resizable="false">  
+                    <p:graphicImage name="ajax-loader.gif" />  
+                </p:dialog>
+                <h:panelGrid class="centrado">
+                    <p:messages id="messages" autoUpdate="true" closable="true" />
+                    <ui:insert name="content" >Content</ui:insert>
+                </h:panelGrid>  
+            </p:layoutUnit>
+            
+        </p:layout>
+        
+    </h:body>
+    
+</html>

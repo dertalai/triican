@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    
+    
+    <h:form id="formRecursos">
+        <p:dataTable id="dataRecursos" var="recurso" 
+                     rowIndexVar="rowIndex"
+                     value="#{of:setToList(personajeControl.personaje.localizacion.recursos)}"  
+                     rows="10" 
+                     rowsPerPageTemplate="5,10,20">  
+            <f:facet name="header">  
+                #{msg.recursosDisponibles}
+            </f:facet>  
+            
+            <p:column>  
+                <f:facet name="header">  
+                    <h:outputText value="#{msg.nombre}" />  
+                </f:facet>  
+                <h:outputText value="#{recurso.tipoElemento.nombre}"/>  
+            </p:column>  
+            
+            <p:column>  
+                <f:facet name="header">  
+                    <h:outputText value="#{msg.acciones}" />  
+                </f:facet>  
+                <p:commandButton value="#{msg.extraer}" type="button"
+                                 onclick="sessionStorage.setItem('cmdExtraer', cmdExtraer_#{rowIndex}.id);
+                                     dialogExtraerRecurso.show();" />
+            </p:column>     
+            
+            <p:column id="columnItemOculto" style='display: none;'>
+                <p:commandButton widgetVar="cmdExtraer_#{rowIndex}"
+                                 update="dataRecursos"
+                                 action="#{personajeControl.extraeRecurso(recurso)}" />
+            </p:column>
+        </p:dataTable>
+        
+        
+        <p:dialog header="#{msg.extraerRecurso}"
+                  widgetVar="dialogExtraerRecurso" resizable="false"
+                  onShow="spinnerCantidadExtraer.value = 1;">  
+            <h:panelGrid columns="2" style="display: none;">
+                <h:outputLabel for="spinnerCantidadExtraer" value="#{msg.cantidad}:" />
+                <p:spinner id="spinnerCantidadExtraer" widgetVar="spinnerCantidadExtraer"
+                           min="1"
+                           value="#{personajeControl.cantidad}"/>
+            </h:panelGrid>
+
+            <h:panelGrid columns="2" width="100%">
+                <p:commandButton value="#{msg.cancelar}" type="button"
+                                 onclick="dialogExtraerRecurso.hide();" />
+                <p:commandButton value="#{msg.extraer}" type="button" style="float: right"
+                                 onclick="dialogExtraerRecurso.hide();
+                                 document.getElementById(sessionStorage.cmdExtraer).click();" />
+            </h:panelGrid>
+
+        </p:dialog>
+    </h:form>
+    
+    
+    
+    
+    
+</html>
