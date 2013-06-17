@@ -60,20 +60,6 @@ public class LoginControl implements Serializable {
         return usuario != null && usuario.getId() != null;
     }
     
-//    public String creaUsuarioPrueba() {
-//        Perfil perfil = new Perfil();
-//        perfil.setNombre("admin");
-//        perfilFacade.create(perfil);
-//
-//        getUsuario().setNombre("prueba");
-//        getUsuario().setContrasena("prueba");
-//        getUsuario().setPerfiles(new HashSet<Perfil>(0));
-//        getUsuario().getPerfiles().procesa(perfil);
-//        usuarioFacade.create(getUsuario());
-//        
-//        return null;
-//    }
-    
     public String entrar() {
         log.info("entrar(): " + getUsuario().getNombre());
         usuario = usuarioFacade.findByUsuario(getUsuario());

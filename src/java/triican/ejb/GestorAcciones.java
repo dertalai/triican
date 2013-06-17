@@ -567,6 +567,8 @@ public class GestorAcciones {
     }
 
     private void annadirSuceso(Personaje personaje, String texto) {
+        personaje = personajeFacade.edit(personaje);
+
         log.info("annadirSuceso("+ personaje.getNombre() + ", " + texto + ")");
         StringBuilder sucesos = new StringBuilder();
         sucesos.append(getTurno() / getTurnosDia())
@@ -576,8 +578,6 @@ public class GestorAcciones {
             sucesos.append(personaje.getSucesos());
         }
         personaje.setSucesos(sucesos.toString());
-
-        personajeFacade.edit(personaje);
     }
 
     public int getTurnosDia() {
